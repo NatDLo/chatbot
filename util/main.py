@@ -18,7 +18,8 @@ except Exception as e:
     print("No se pudieron cargar embeddings al inicio:", e)
 
 # Montar static
-app.mount("/static", StaticFiles(directory="../static"), name="static")
+BASE_DIR = Path(__file__).resolve().parent.parent  # sube 2 niveles desde util/main.py
+app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
 # Incluir routers
 app.include_router(router)
