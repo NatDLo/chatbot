@@ -12,7 +12,7 @@ Base = declarative_base()
 
 
 def init_db():
-    from models import Embedding
+    from util.models import Embedding
     Base.metadata.create_all(bind=engine)
 
 
