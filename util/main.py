@@ -9,9 +9,9 @@ from util.chatbot import ChatbotEmpresa
 from pathlib import Path
 
 
-# BASE_DIR = raíz del proyecto (carpeta chatbot)
-BASE_DIR = Path(__file__).resolve().parent.parent
-sys.path.append(str(BASE_DIR / "util"))
+ROOT = Path(__file__).resolve().parent.parent  # carpeta chatbot/
+sys.path.append(str(ROOT / "util"))
+
 app = FastAPI(title="Natichat")
 
 # Crear DB
@@ -24,8 +24,7 @@ except Exception as e:
     print("No se pudieron cargar embeddings al inicio:", e)
 
 # Montar static
-STATIC_DIR = BASE_DIR / "static"
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+app.mount("/static", StaticFiles(directory=ROOT / "static"), name="static")
 
 # Incluir routers
 app.include_router(router)
@@ -33,8 +32,8 @@ app.include_router(router)
 # Servir HTML desde static
 @app.get("/admin")
 def admin_page():
-    return FileResponse("../static/admin.html")
+    return FileResponse(ROOT / "static" / "admin.html")
 
 @app.get("/")
 def chat_page():
-    return FileResponse("../static/index.html")
+    return FileResponse(ROOT / "static" / "index.html")
