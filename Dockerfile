@@ -1,5 +1,5 @@
-# Usamos Python 3.12 (elige la versión compatible con tu proyecto)
-FROM python:3.12-slim
+# Usamos Python 3.11 (elige la versión compatible con tu proyecto)
+FROM python:3.11-slim
 
 # Establecemos el directorio de trabajo
 WORKDIR /app
@@ -8,7 +8,7 @@ WORKDIR /app
 COPY requirements.txt .
 
 RUN pip install --upgrade pip setuptools wheel \
-    && pip install --no-cache-dir -r requirements.txt
+    && pip install --no-cache-dir --only-binary=:all: -r requirements.txt
 
 # Copiamos todo el proyecto
 COPY . .
