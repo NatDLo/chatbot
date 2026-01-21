@@ -9,7 +9,7 @@ import unicodedata
 from dotenv import load_dotenv
 from datetime import datetime
 from util.db import SessionLocal
-from util.models import Conversation
+from util.models import Conversation, Embedding
 from openai import OpenAI
 from typing import List, Dict
 
@@ -47,9 +47,6 @@ class ChatbotEmpresa:
         Los registros en DB ya están chunkeados y con sus embeddings en vector.
         """
         print("Cargando información de la empresa (DB)...")
-
-        from db import SessionLocal
-        from models import Embedding
 
         textos: List[str] = []
         vectores: List[List[float]] = []
