@@ -9,10 +9,9 @@ from util.chatbot import ChatbotEmpresa
 from pathlib import Path
 
 
-# carpeta raíz del proyecto
+# BASE_DIR = raíz del proyecto (carpeta chatbot)
 BASE_DIR = Path(__file__).resolve().parent.parent
-sys.path.append(str(BASE_DIR))
-
+sys.path.append(str(BASE_DIR / "util"))
 app = FastAPI(title="Natichat")
 
 # Crear DB
