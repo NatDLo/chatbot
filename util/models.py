@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime
 from sqlalchemy.dialects.sqlite import JSON
 from sqlalchemy.sql import func
-from db import Base
+from util.db import Base
 from typing import Optional, Dict
 from pydantic import BaseModel
 

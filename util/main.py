@@ -3,8 +3,8 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from db import init_db
-from routers import router, chatbot
-from chatbot import ChatbotEmpresa
+from util.routers import router, chatbot
+from util.chatbot import ChatbotEmpresa
 
 app = FastAPI(title="Natichat")
 

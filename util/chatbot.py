@@ -8,8 +8,8 @@ import difflib
 import unicodedata
 from dotenv import load_dotenv
 from datetime import datetime
-from db import SessionLocal
-from models import Conversation
+from util.db import SessionLocal
+from util.models import Conversation
 from openai import OpenAI
 from typing import List, Dict
 

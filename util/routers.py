@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from db import get_db
-from models import Embedding, EmbeddingCreate, ChatRequest
-from chatbot import ChatbotEmpresa
+from util.db import get_db
+from util.models import Embedding, EmbeddingCreate, ChatRequest
+from util.chatbot import ChatbotEmpresa
 
 router = APIRouter()
 
