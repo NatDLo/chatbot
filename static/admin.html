@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Natichat - Admin</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Admin - Embeddings</h1>
+    <nav>
+      <a href="/index.html">Chat</a>
+      <a href="/admin.html">Admin</a>
+    </nav>
+  </header>
+  <main>
+    <section>
+      <form id="emb-form">
+        <input type="text" id="key" placeholder="key (optional)" />
+        <textarea id="text" placeholder="base text" required></textarea>
+        <textarea id="meta" placeholder='meta (JSON) optional, e.g.: {"location":"Center"}'></textarea>
+        <button type="submit">Create embedding</button>
+      </form>
+    </section>
+    <section>
+      <h3>Saved embeddings</h3>
+      <button id="refresh">Refresh</button>
+      <ul id="emb-list"></ul>
+    </section>
+  </main>
+  <script src="/static/admin.js"></script>
+</body>
+</html>

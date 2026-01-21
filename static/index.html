@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Natichat - Chat</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Natichat - Alquileres</h1>
+    <nav>
+      <a href="/index.html">Chat</a>
+      <a href="/admin.html">Admin</a>
+    </nav>
+  </header>
+  <main>
+    <section class="chat">
+      <div id="messages"></div>
+      <form id="chat-form">
+        <input id="chat-input" type="text" placeholder="Ask something..." required />
+        <button type="submit">Send</button>
+      </form>
+    </section>
+    <aside class="sources">
+      <h3>Sources</h3>
+      <ul id="sources"></ul>
+    </aside>
+  </main>
+  <script src="/static/chat.js"></script>
+</body>
+</html>
