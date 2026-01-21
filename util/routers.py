@@ -31,6 +31,7 @@ def list_embeddings(db: Session = Depends(get_db)):
 
 # --- CHAT ---
 @router.post("/chat/")
-def chat_endpoint(request: ChatRequest):
+def chat_endpoint(request: ChatRequest, db: Session = Depends(get_db)):
+    chatbot.cargar_informacion_empresa({})  # recarga desde la DB
     respuesta = chatbot.responder_pregunta(request.text)
     return {"response": respuesta}
