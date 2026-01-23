@@ -1,4 +1,3 @@
-# chatbot.py
 import json
 import math
 import pickle
@@ -13,60 +12,59 @@ from util.models import Conversation, Embedding
 from openai import OpenAI
 from typing import List, Dict
 
-# Carga variables del .env automáticamente
+# bring in environment variables
 load_dotenv()
 
-# Configuración
-API_KEY = os.getenv("OPENAI_API_KEY")  # Usa tu API key
+# Configuration
+API_KEY = os.getenv("OPENAI_API_KEY")  # Use your API key
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-large")
 CHAT_MODEL = os.getenv("CHAT_MODEL", "gpt-4o-mini")
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 class ChatbotEmpresa:
-    def __init__(self, nombre_empresa: str):
-        self.nombre_empresa = nombre_empresa
-        self.contexto_base = ""
-        self.base_conocimiento = []
-        self.embeddings_conocimiento = []
+    def __init__(self, company: str):
+        self.company = company
+        self.base_context = ""
+        self.knowledge_base = []
+        self.knowledge_embeddings = []
 
-    def normalizar_texto(self, texto: str) -> str:
+    def normalize_text(self, text: str) -> str:
         """
-        Normaliza el texto para mejorar la consistencia en búsquedas
-        y comparaciones (minúsculas, sin acentos).
+        Normalizes the text to improve consistency in searches
+        and comparisons (lowercase, without accents).
         """
-        texto = texto.lower()
-        texto = ''.join(
-            c for c in unicodedata.normalize('NFD', texto)
+        text = text.lower()
+        text = ''.join(
+            c for c in unicodedata.normalize('NFD', text)
             if unicodedata.category(c) != 'Mn'
         )
-        return texto
+        return text
         
-    def cargar_informacion_empresa(self, archivos: Dict[str, str]):
+    def load_company_information(self, files: Dict[str, str]):
         """
-        Carga la información específica de la empresa desde la base de datos.
-        Los registros en DB ya están chunkeados y con sus embeddings en vector.
+        Loads company-specific information from the database.
+        Records in DB are already chunked and have their embeddings in vector form.
         """
-        print("Cargando información de la empresa (DB)...")
 
-        textos: List[str] = []
-        vectores: List[List[float]] = []
+        texts: List[str] = []
+        vectors: List[List[float]] = []
 
-        session = SessionLocal()
+        session = LocalSession()
         try:
-            registros = session.query(Embedding).all()
-            if not registros:
-                print("No hay registros en la tabla embeddings")
+            records = session.query(Embedding).all()
+            if not records:
+                print("No records in the embeddings table.")
             else:
-                for r in registros:
-                    texto = (r.text or "").strip()
-                    if not texto:
+                for r in records:
+                    text = (r.text or "").strip()
+                    if not text:
                         continue
 
                     vector = r.vector
                     if isinstance(vector, list):
                         v = vector
                     elif isinstance(vector, str):
-                        # defensa por si el JSON estuvo serializado como string
+                        # defense in case the JSON was serialized as a string
                         try:
                             parsed = json.loads(vector)
                             v = parsed if isinstance(parsed, list) else []
@@ -75,47 +73,47 @@ class ChatbotEmpresa:
                     else:
                         v = []
 
-                    textos.append(texto)
-                    vectores.append(v)
+                    texts.append(text)
+                    vectors.append(v)
 
-                print(f"{len(textos)} entradas cargadas desde DB")
+                print(f"{len(texts)} entries loaded from DB")
 
-            # Usar directamente los chunks y sus vectores persistidos
-            self.base_conocimiento = textos
-            self.embeddings_conocimiento = vectores
-            self.contexto_base = "\n\n".join(textos)
+            # Use directly the chunks and their persisted vectors
+            self.knowledge_base = texts
+            self.knowledge_embeddings = vectors
+            self.base_context = "\n\n".join(texts)
 
-            con_vec = sum(1 for v in self.embeddings_conocimiento if isinstance(v, list) and v)
-            print(f"Información lista: {len(self.base_conocimiento)} entradas, {con_vec} con embeddings")
+            con_vec = sum(1 for v in self.knowledge_embeddings if isinstance(v, list) and v)
+            print(f"Information ready: {len(self.knowledge_base)} entries, {con_vec} with embeddings")
         finally:
             session.close()
         
-    def _dividir_en_chunks(self, texto: str, oraciones_por_chunk: int = 2) -> list:
-        oraciones = re.split(r'(?<=[.!?])\s+', texto)
-        oraciones = [o.strip() for o in oraciones if o.strip()]
+    def _separate_in_chunks(self, text: str, sentences_per_chunk: int = 2) -> list:
+        sentences = re.split(r'(?<=[.!?])\s+', text)
+        sentences = [s.strip() for s in sentences if s.strip()]
 
-        chunks = [" ".join(oraciones[i:i+oraciones_por_chunk]) for i in range(0, len(oraciones), oraciones_por_chunk)]
-        chunks = [self.normalizar_texto(c) for c in chunks] 
+        chunks = [" ".join(sentences[i:i+sentences_per_chunk]) for i in range(0, len(sentences), sentences_per_chunk)]
+        chunks = [self.normalize_text(c) for c in chunks] 
 
         return chunks
                 
-    def crear_embeddings(self):
+    def create_embeddings(self):
         """
-        Crea embeddings para la base de conocimiento
+        Creates embeddings for the knowledge base
         """
-        print("Creando embeddings...")
+        print("Creating embeddings...")
         
-        self.embeddings_conocimiento = []
+        self.knowledge_embeddings = []
         
-        for chunk in self.base_conocimiento:
-            embedding = self._obtener_embedding(chunk)
-            self.embeddings_conocimiento.append(embedding)
+        for chunk in self.knowledge_base:
+            embedding = self._obtain_embedding(chunk)
+            self.knowledge_embeddings.append(embedding)
             
-        print("Embeddings creados correctamente")
+        print("Embeddings created successfully")
     
-    def _obtener_embedding(self, text: str) -> List[float]:
+    def _obtain_embedding(self, text: str) -> List[float]:
         """
-        Obtiene el embedding de un texto usando OpenAI
+        Obtains the embedding of a text using OpenAI
         """
         resp = client.embeddings.create(
             model=EMBEDDING_MODEL,
@@ -123,9 +121,9 @@ class ChatbotEmpresa:
         )
         return resp.data[0].embedding
     
-    def _calcular_similitud(self, vec1: List[float], vec2: List[float]) -> float:
+    def _calculate_similarity(self, vec1: List[float], vec2: List[float]) -> float:
         """
-        Calcula la similitud coseno entre dos vectores de embeddings
+        Calculates the cosine similarity between two embedding vectors
         """
         dot = sum(x*y for x,y in zip(vec1, vec2))
         na = sum(x*x for x in vec1)**0.5
@@ -134,60 +132,61 @@ class ChatbotEmpresa:
             return 0.0
         return dot/(na*nb)
     
-    def buscar_informacion_relevante(self, pregunta: str, top_n: int = 3) -> str:
+    def search_relevant_information(self, question: str, top_n: int = 3) -> str:
         """
-        Busca la información más relevante en la base de conocimiento
-        usando similitud coseno con el embedding de la pregunta.
+        Searches for the most relevant information in the knowledge base
+        using cosine similarity with the embedding of the question.
         """
-        pregunta = self.normalizar_texto(pregunta)
-        embedding_pregunta = self._obtener_embedding(pregunta)
+        question = self.normalize_text(question)
+        embedding_question = self._obtain_embedding(question)
         
-        # calcular similitudes
-        similitudes = [(self._calcular_similitud(embedding_pregunta, e), i) 
-                    for i, e in enumerate(self.embeddings_conocimiento)]
+        # calculate similarities
+        similarities = [(self._calculate_similarity(embedding_question, e), i) 
+                    for i, e in enumerate(self.knowledge_embeddings)]
         
-        similitudes.sort(reverse=True, key=lambda x: x[0])
+        similarities.sort(reverse=True, key=lambda x: x[0])
         
-        informacion_relevante = []
-        for similitud, indice in similitudes[:top_n]:
-            if similitud > 0.1:  # <- ajuste de umbral, mas chico mas flexible, para contemplar tmb errores ortograficos
-                informacion_relevante.append(self.base_conocimiento[indice])
+        relevant_information = []
+        for similarity, index in similarities[:top_n]:
+            if similarity > 0.1:  # <- threshold adjustment, smaller but more flexible, to also consider spelling errors
+                relevant_information.append(self.knowledge_base[index])
         
-        return "\n\n".join(informacion_relevante)
+        return "\n\n".join(relevant_information)
 
     
-    def responder_pregunta(self, pregunta: str, historial: List[Dict] = None) -> str:
+    def answer_question(self, question: str, history: List[Dict] = None) -> str:
         """
-        Genera una respuesta como si fuera un operador
+        Generates an answer as if it were an operator of customer service
+        for the specified company, using relevant information from the knowledge base.
         """
-        # Buscar información relevante
-        contexto = self.buscar_informacion_relevante(pregunta)
+        # Search for relevant information
+        context = self.search_relevant_information(question)
         
-        # Preparar el prompt
+        # Prepare the prompt
         prompt = f"""
-        Eres un operador de atención al cliente de {self.nombre_empresa}.
-        Tu tono debe ser profesional, amable y servicial.
+        You are a customer service operator for {self.company_name}.
+        Your tone should be professional, kind, and helpful.
         
-        INFORMACIÓN DE LA EMPRESA:
-        {contexto}
+        COMPANY INFORMATION:
+        {context}
         
-        HISTORIAL DE CONVERSACIÓN (si aplica):
-        {historial if historial else 'Primera consulta'}
+        CONVERSATION HISTORY (if applicable):
+        {history if history else 'First query'}
         
-        PREGUNTA DEL CLIENTE:
-        {pregunta}
+        CUSTOMER QUESTION:
+        {question}
         
-        INSTRUCCIONES:
-        1. Responde basándote ÚNICAMENTE en la información proporcionada
-        2. Si la respuesta no está en la información, di: "No tengo esa información específica, pero puedo contactarte con el departamento correspondiente"
-        3. Sé conciso pero completo
-        4. Mantén un tono amable y profesional
-        5. Ofrece ayuda adicional si es apropiado
+        INSTRUCTIONS:
+        1. Respond based ONLY on the provided information
+        2. If the answer is not in the information, say: "I don't have that specific information, but I can connect you with the appropriate department"
+        3. Be concise but complete
+        4. Maintain a kind and professional tone
+        5. Offer additional help if appropriate
         
-        RESPUESTA:
+        ANSWER:
         """
         
-        # Generar respuesta
+        # Generate answer
         resp = client.chat.completions.create(
             model=CHAT_MODEL,
             messages=[
@@ -197,23 +196,23 @@ class ChatbotEmpresa:
         )
         return resp.choices[0].message.content
     
-    def guardar_conversacion(self, usuario: str, conversacion: list):
+    def save_conversation(self, user: str, conversation: list):
         """
-        Guarda la conversación en la base de datos usando el modelo Conversation.
+        Saves the conversation in the database using the Conversation model.
         """
         db = SessionLocal()
         try:
-            nueva_conversacion = Conversation(
-                usuario=usuario,
-                conversacion=conversacion,
+            new_conversation = Conversation(
+                user=user,
+                conversation=conversation,
                 created_at=datetime.now()
             )
-            db.add(nueva_conversacion)
+            db.add(new_conversation)
             db.commit()
-            db.refresh(nueva_conversacion)
-            print(f"Conversación de {usuario} guardada en DB (id={nueva_conversacion.id})")
+            db.refresh(new_conversation)
+            print(f"Conversation from {user} saved in DB (id={new_conversation.id})")
         except Exception as e:
             db.rollback()
-            print(f"Error guardando conversación: {e}")
+            print(f"Error saving conversation: {e}")
         finally:
             db.close()

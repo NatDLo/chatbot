@@ -1,4 +1,4 @@
-# Inicialización de la aplicación FastAPI, incluyendo routers para chat y embeddings
+# Initialize the app and configure routes and static files
 import sys
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -9,27 +9,27 @@ from util.chatbot import ChatbotEmpresa
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parent.parent  # carpeta chatbot/
+ROOT = Path(__file__).resolve().parent.parent  # folder chatbot/
 sys.path.append(str(ROOT / "util"))
 
 app = FastAPI(title="Natichat")
 
-# Crear DB
+# Create DB
 init_db()
 
-# cargar datos desde la DB
+# Load data from DB
 try:
-    chatbot.cargar_informacion_empresa({})
+    chatbot.load_company_information({})
 except Exception as e:
-    print("No se pudieron cargar embeddings al inicio:", e)
+    print("Failed to load embeddings at startup:", e)
 
-# Montar static
+# Mount static
 app.mount("/static", StaticFiles(directory=ROOT / "static"), name="static")
 
-# Incluir routers
+# Include routers
 app.include_router(router)
 
-# Servir HTML desde static
+# Serve HTML from static
 @app.get("/admin")
 def admin_page():
     return FileResponse(ROOT / "static" / "admin.html")

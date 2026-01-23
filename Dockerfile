@@ -1,20 +1,20 @@
-# Usamos Python 3.11 (elige la versión compatible con tu proyecto)
+# We use the official Python slim image as base
 FROM python:3.11-slim
 
-# Establecemos el directorio de trabajo
+# Set the working directory
 WORKDIR /app
 
-# Copiamos requirements y los instalamos primero (para aprovechar cache)
+# Copy requirements and install them first (to leverage cache)
 COPY requirements.txt .
 
 RUN pip install --upgrade pip setuptools wheel \
     && pip install --no-cache-dir --only-binary=:all: -r requirements.txt
 
-# Copiamos todo el proyecto
+# Copy the entire project
 COPY . .
 
-# Exponemos el puerto que uvicorn usará
+# Expose the port that uvicorn will use
 EXPOSE 8000
 
-# Comando de inicio
+# Start command
 CMD ["uvicorn", "util.main:app", "--host", "0.0.0.0", "--port", "8000"]

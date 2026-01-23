@@ -18,8 +18,8 @@ class Conversation(Base):
     __tablename__ = "conversations"
 
     id = Column(Integer, primary_key=True)
-    usuario = Column(String, nullable=False)
-    conversacion = Column(JSON, nullable=False)
+    user = Column(String, nullable=False)
+    conversation = Column(JSON, nullable=False)
     created_at = Column(DateTime, server_default=func.now())
 
 
