@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from util.db import init_db
 from util.routers import router, chatbot
-from util.chatbot import ChatbotEmpresa
+from util.chatbot import CompanyChatbot
 from pathlib import Path
 
 
