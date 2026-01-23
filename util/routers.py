@@ -2,12 +2,12 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from util.db import get_db
 from util.models import Embedding, EmbeddingCreate, ChatRequest
-from util.chatbot import ChatbotEmpresa
+from util.chatbot import CompanyChatbot
 
 router = APIRouter()
 
 # Initialize chatbot instance
-chatbot = ChatbotEmpresa(company="My Company")
+chatbot = CompanyChatbot(company="My Company")
 
 # --- ADMIN ---
 @router.post("/admin/embeddings/")
