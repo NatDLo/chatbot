@@ -21,7 +21,7 @@ EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-large")
 CHAT_MODEL = os.getenv("CHAT_MODEL", "gpt-4o-mini")
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-class ChatbotEmpresa:
+class CompanyChatbot:
     def __init__(self, company: str):
         self.company = company
         self.base_context = ""
@@ -216,4 +216,5 @@ class ChatbotEmpresa:
             print(f"Error saving conversation: {e}")
         finally:
             db.close()
+
 
