@@ -7,7 +7,7 @@ import difflib
 import unicodedata
 from dotenv import load_dotenv
 from datetime import datetime
-from util.db import SessionLocal
+from util.db import LocalSession
 from util.models import Conversation, Embedding
 from openai import OpenAI
 from typing import List, Dict
