@@ -1,6 +1,6 @@
-# Natichat – Rental Web Chat Application
+# Natichat – Chat Application
 
-A small RAG-style chat app for rental services. It provides:
+A small RAG-style chat app. It provides:
 - A FastAPI backend that stores text chunks with OpenAI embeddings in a database and answers questions using retrieved context.
 - A simple static frontend with a chat UI and an admin UI to create/list embeddings.
 
@@ -133,5 +133,6 @@ curl -X POST http://localhost:8000/chat/ \
 Issues and pull requests are welcome.
 
 ## License
+
 
 MIT
