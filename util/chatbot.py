@@ -164,7 +164,7 @@ class CompanyChatbot:
         
         # Prepare the prompt
         prompt = f"""
-        You are a customer service operator for {self.company_name}.
+        You are a customer service operator for {self.company}.
         Your tone should be professional, kind, and helpful.
         
         COMPANY INFORMATION:
@@ -200,7 +200,7 @@ class CompanyChatbot:
         """
         Saves the conversation in the database using the Conversation model.
         """
-        db = SessionLocal()
+        db = LocalSession()
         try:
             new_conversation = Conversation(
                 user=user,
@@ -216,5 +216,6 @@ class CompanyChatbot:
             print(f"Error saving conversation: {e}")
         finally:
             db.close()
+
 
 
