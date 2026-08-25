@@ -54,6 +54,7 @@ chatbot/
    ```
    Required:
    - OPENAI_API_KEY=your_key
+     
    Optional (defaults shown):
    - EMBEDDING_MODEL=text-embedding-3-large
    - CHAT_MODEL=gpt-4o-mini
